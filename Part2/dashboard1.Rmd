@@ -49,13 +49,24 @@ Column {data-width=350}
 ```{r}
 
 gadata_most_popular <- gadata %>% 
-  count(pageTitle, wt = pageviews, sort=TRUE) %>% 
-  head(10)
+  count(pageTitle, wt = pageviews, sort=TRUE)
+
+## For those who aren't as comfortable with the options in count, the following
+## code would also work
+# gadata_most_popular <- gadata %>% 
+#   group_by(pageTitle) %>% 
+#   summarize(n = sum(pageviews)) %>% 
+#   arrange(desc(n))
+
 reactable(gadata_most_popular,
            columns = list(pageTitle     = colDef(name = "Title",
                                             align = "left", 
                                             maxWidth = 250),
                           n             = colDef(name = "Page Views",
-                                             maxWidth = 100)))
+                                             maxWidth = 100)),
+            pagination = FALSE,
+            searchable = TRUE,
+            striped = TRUE)
+
 ```
 
