@@ -1,0 +1,61 @@
+---
+title: "Blog Popularity"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(ggplot2)
+library(dplyr)
+library(reactable)
+library(readr)
+
+gadata <- read_csv("./data/clickbait_GA_data.csv")
+
+```
+
+The Google Analytics data from **clickbait.com** shows dramatic variance in post popularity.
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Page Views by Day
+
+```{r}
+
+theme_set(theme_minimal())
+
+gadata_by_day <- gadata %>% 
+  group_by(date) %>% 
+  summarize(pagesums = sum(pageviews))
+
+g <- ggplot(gadata_by_day, aes(x = date, y = pagesums)) +
+  geom_point(color = "blue") +
+  geom_line(color = "blue") +
+  scale_x_date() +
+  labs(x = "", y = "", title = "")
+show(g)
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Most Popular Posts
+
+```{r}
+
+gadata_most_popular <- gadata %>% 
+  count(pageTitle, wt = pageviews, sort=TRUE) %>% 
+  head(10)
+reactable(gadata_most_popular,
+           columns = list(pageTitle     = colDef(name = "Title",
+                                            align = "left", 
+                                            maxWidth = 250),
+                          n             = colDef(name = "Page Views",
+                                             maxWidth = 100)))
+```
+
