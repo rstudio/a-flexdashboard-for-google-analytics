@@ -1,4 +1,4 @@
-# A Flexdashboard for Blog with Google Analytics
+# Custom Google Analytics Dashboards with R Code
 
 This is a supporting repository for a blog.rstudio.com blog post about building a flexdashboard for Google Analytics. 
 
