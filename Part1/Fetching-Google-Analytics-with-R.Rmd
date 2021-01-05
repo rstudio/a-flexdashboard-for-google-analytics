@@ -1,0 +1,54 @@
+---
+title: "Fetching Google Analytics Data from R"
+author: "Carl Howe, RStudio"
+date: "1/5/2021"
+output: html_document
+---
+```{r include=TRUE, echo=TRUE, eval=FALSE}
+library(googleAnalyticsR)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(reactable)
+library(stringr)
+
+## First, authenticate with our client OAUTH credentials from step 5 of the blog post.
+googleAuthR::gar_set_client(json = "secrets/oauth-account-key.json")
+
+## Now, provide the service account email and private key
+ga_auth(email = "ga-analysis@test-project-291617.iam.gserviceaccount.com",
+        json_file = "secrets/service-account-key.json")
+
+## At this point, we should be properly authenticated and ready to go. We can test this
+## by getting a list of all the accounts that this test project has access to. Typically,
+## this will be only one if you've created your own service key. If it isn't your only
+## account, select the appropriate viewId from your list of accounts.
+
+my_accounts <- ga_account_list()
+my_id <- my_accounts$viewId     ## Modify this if you have more than one account
+
+## Let's look at all the visitors to our site. This segment is one of several provided
+## by Google Analytics by default.
+
+all_users <- segment_ga4("AllTraffic", segment_id = "gaid::-1")
+
+## Let's look at just one day.
+
+ga_start_date <- today()
+ga_end_date <- today()
+
+## Make the request to GA
+data_fetch <- google_analytics(my_id,
+                               segments = all_users,
+                               date_range = c(ga_start_date, ga_end_date),
+                               metrics = c("pageviews"),
+                               dimensions = c("landingPagePath"),
+                               anti_sample = TRUE)
+
+## Let's just create a table of the most viewed posts
+
+most_viewed_posts <- data_fetch %>% 
+  mutate(Path = str_trunc(landingPagePath, width=40)) %>% 
+  count(Path, wt=pageviews, sort=TRUE)
+head(most_viewed_posts, n=5)
+```
