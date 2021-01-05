@@ -64,7 +64,6 @@ reactable(gadata_most_popular,
                                             maxWidth = 250),
                           n             = colDef(name = "Page Views",
                                              maxWidth = 100)),
-            pagination = FALSE,
             searchable = TRUE,
             striped = TRUE)
 
